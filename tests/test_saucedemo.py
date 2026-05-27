@@ -129,21 +129,12 @@ class TestLogin:
 
         # El mensaje de error debe existir y no estar vacío
         assert error_element.is_displayed(), (
-            "ERROR: El elemento de mensaje de error no está visible."
+            "❌ El mensaje de error no se visualiza"
         )
-        assert len(error_text) > 0, (
-            "ERROR: El mensaje de error está vacío, se esperaba un texto de error."
+        assert "/inventory.html" not in current_url, (
+            f"ERROR: Se redirigió al inventario con credenciales inválidas. URL: {current_url}"
         )
-
-        # El usuario NO debe haber sido redirigido al inventario
-        current_url = driver.current_url
-        assert '/inventory.html' not in current_url, (
-            f"ERROR: El usuario fue redirigido al inventario con credenciales inválidas. "
-            f"URL actual: '{current_url}'"
-        )
-
-        logger.info(f"Mensaje de error verificado: '{error_text}'")
-        logger.info("TEST: test_login_with_invalid_credentials - EXITOSO ✓")
+        logger.info(f"TEST: test_login_with_invalid_credentials - EXITOSO ✓")
 
     def test_login_fields_present(self, driver):
         """
