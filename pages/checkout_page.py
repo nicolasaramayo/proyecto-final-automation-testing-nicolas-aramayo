@@ -29,12 +29,12 @@ class CheckoutPage(BasePage):
         logger.info(f"Datos del cliente completados: {first_name} {last_name}, CP: {postal_code}")
 
     def click_continue(self):
-        """Hace clic en el boton 'Continue' para pasar al siguiente paso."""
+        """Envia el formulario de checkout usando submit() en el campo postal."""
         import time
         time.sleep(1)
-        btn = self.wait_for_element_clickable(Locators.CONTINUE_BUTTON)
-        self.driver.execute_script("arguments[0].click();", btn)
-        logger.info("Clic en 'Continue' de Checkout.")
+        postal_field = self.wait_for_element_clickable(Locators.POSTAL_CODE_INPUT)
+        postal_field.submit()
+        logger.info("Formulario enviado via submit().")
 
     def click_finish(self):
         """Hace clic en el boton 'Finish' para completar la compra."""
