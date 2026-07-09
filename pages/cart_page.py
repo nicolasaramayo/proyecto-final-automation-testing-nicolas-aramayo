@@ -30,6 +30,8 @@ class CartPage(BasePage):
         return names
 
     def click_checkout(self):
-        """Hace clic en el botón 'Checkout' para iniciar el proceso de pago."""
-        self.click(Locators.CHECKOUT_BUTTON)
-        logger.info("Navegando a la página de Checkout.")
+        """Hace clic en el boton 'Checkout' para iniciar el proceso de pago."""
+        btn = self.wait_for_element_clickable(Locators.CHECKOUT_BUTTON)
+        self.driver.execute_script("arguments[0].click();", btn)
+        self.wait_for_url_contains("/checkout-step-one.html")
+        logger.info("Navegando a la pagina de Checkout.")
