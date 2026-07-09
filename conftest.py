@@ -6,6 +6,7 @@
 # =============================================================================
 
 import os
+import sys
 import logging
 import pytest
 from datetime import datetime
@@ -50,13 +51,26 @@ def driver():
     from webdriver_manager.chrome import ChromeDriverManager
     driver_path = ChromeDriverManager().install()
     
-    # Corregir bug de webdriver-manager en Windows donde a veces selecciona el archivo de licencias/noticias
-    if not driver_path.lower().endswith(".exe"):
-        base_dir = os.path.dirname(driver_path)
+    # Corregir bug de webdriver-manager donde a veces selecciona archivos incorrectos
+    # (THIRD_PARTY_NOTICES, LICENSE, etc.) en vez del ejecutable de chromedriver
+    base_dir = os.path.dirname(driver_path)
+    if sys.platform == "win32":
+        # En Windows, buscar chromedriver.exe
         exe_path = os.path.join(base_dir, "chromedriver.exe")
         if os.path.exists(exe_path):
             driver_path = exe_path
-            
+    else:
+        # En Linux/Mac, buscar el ejecutable chromedriver
+        exe_path = os.path.join(base_dir, "chromedriver")
+        if os.path.exists(exe_path):
+            driver_path = exe_path
+        # Buscar en subdirectorios (ej. chromedriver-linux64/)
+        for root, dirs, files in os.walk(base_dir):
+            for f in files:
+                if f == "chromedriver" and not f.endswith(".txt"):
+                    driver_path = os.path.join(root, f)
+                    break
+                    
     service = Service(executable_path=driver_path)
     chrome_driver = webdriver.Chrome(service=service, options=chrome_options)
 
