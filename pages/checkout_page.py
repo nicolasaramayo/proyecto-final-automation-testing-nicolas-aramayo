@@ -31,10 +31,11 @@ class CheckoutPage(BasePage):
     def click_continue(self):
         """Hace clic en el boton 'Continue' para pasar al siguiente paso."""
         import time
+        from selenium.webdriver.common.keys import Keys
         time.sleep(1)
-        btn = self.wait_for_element_clickable(Locators.CONTINUE_BUTTON)
-        self.driver.execute_script("arguments[0].click();", btn)
-        logger.info("Clic en 'Continue' de Checkout.")
+        postal_field = self.wait_for_element_clickable(Locators.POSTAL_CODE_INPUT)
+        postal_field.send_keys(Keys.RETURN)
+        logger.info("Enter presionado en campo postal para continuar.")
 
     def click_finish(self):
         """Hace clic en el boton 'Finish' para completar la compra."""
