@@ -70,6 +70,11 @@ def driver():
                 if f == "chromedriver" and not f.endswith(".txt"):
                     driver_path = os.path.join(root, f)
                     break
+        # Asegurar permisos de ejecucion en Linux/Mac
+        if os.path.exists(driver_path):
+            import stat
+            st = os.stat(driver_path)
+            os.chmod(driver_path, st.st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
                     
     service = Service(executable_path=driver_path)
     chrome_driver = webdriver.Chrome(service=service, options=chrome_options)
