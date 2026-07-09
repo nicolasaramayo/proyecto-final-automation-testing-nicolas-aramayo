@@ -40,7 +40,8 @@ class InventoryPage(BasePage):
         first_product = self.driver.find_elements(*Locators.PRODUCT_ITEMS)[0]
         product_name = first_product.find_element(*Locators.PRODUCT_NAME).text.strip()
         add_button = first_product.find_element(*Locators.ADD_TO_CART_BUTTON)
-        add_button.click()
+        # Usar JavaScript click para mayor compatibilidad en headless
+        self.driver.execute_script("arguments[0].click();", add_button)
         logger.info(f"Producto '{product_name}' agregado al carrito.")
         return product_name
 
@@ -63,8 +64,12 @@ class InventoryPage(BasePage):
         return self.get_text(Locators.CART_BADGE)
 
     def go_to_cart(self):
-        """Navega a la página del carrito haciendo clic en el ícono del carrito."""
-        self.click(Locators.CART_LINK)
+        """Navega a la pagina del carrito haciendo clic en el icono del carrito."""
+        cart_link = self.wait_for_element_clickable(Locators.CART_LINK)
+        # Usar JavaScript click para mayor compatibilidad en headless
+        self.driver.execute_script("arguments[0].click();", cart_link)
+        # Esperar a que la URL cambie a cart.html
+        self.wait_for_url_contains("/cart.html")
 
     def is_burger_menu_displayed(self):
         """Verifica si el menú hamburguesa está visible."""
