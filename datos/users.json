@@ -1,0 +1,29 @@
+{
+  "valid_users": [
+    {
+      "username": "standard_user",
+      "password": "secret_sauce",
+      "description": "Usuario estándar válido"
+    }
+  ],
+  "invalid_users": [
+    {
+      "username": "locked_out_user",
+      "password": "secret_sauce",
+      "error_message": "Epic sadface: Sorry, this user has been locked out.",
+      "description": "Usuario bloqueado"
+    },
+    {
+      "username": "invalid_user",
+      "password": "secret_sauce",
+      "error_message": "Epic sadface: Username and password do not match any user in this service",
+      "description": "Usuario inexistente"
+    },
+    {
+      "username": "standard_user",
+      "password": "wrong_password",
+      "error_message": "Epic sadface: Username and password do not match any user in this service",
+      "description": "Contraseña incorrecta"
+    }
+  ]
+}

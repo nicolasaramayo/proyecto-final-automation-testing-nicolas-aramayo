@@ -97,7 +97,7 @@ class Locators:
     PRODUCT_PRICE = (By.CLASS_NAME, 'inventory_item_price')
 
     # Botón "Add to cart" dentro de cada tarjeta de producto
-    ADD_TO_CART_BUTTON = (By.CSS_SELECTOR, '.inventory_item button')
+    ADD_TO_CART_BUTTON = (By.CSS_SELECTOR, 'button.btn_inventory')
 
     # Menú hamburguesa (navegación principal)
     BURGER_MENU = (By.ID, 'react-burger-menu-btn')
@@ -120,3 +120,20 @@ class Locators:
 
     # Nombre del producto dentro del carrito
     CART_ITEM_NAME = (By.CLASS_NAME, 'inventory_item_name')
+
+    # Botón "Checkout" en el carrito
+    CHECKOUT_BUTTON = (By.ID, 'checkout')
+
+    # ------------------------------------------------------------------
+    # PÁGINA DE CHECKOUT (PASO 1: INFORMACIÓN DEL CLIENTE)
+    # ------------------------------------------------------------------
+    FIRST_NAME_INPUT = (By.ID, 'first-name')
+    LAST_NAME_INPUT = (By.ID, 'last-name')
+    POSTAL_CODE_INPUT = (By.ID, 'postal-code')
+    CONTINUE_BUTTON = (By.ID, 'continue')
+
+    # ------------------------------------------------------------------
+    # PÁGINA DE CHECKOUT (PASO 2: VISTA PREVIA Y FINALIZACIÓN)
+    # ------------------------------------------------------------------
+    FINISH_BUTTON = (By.ID, 'finish')
+    COMPLETE_HEADER = (By.CLASS_NAME, 'complete-header')

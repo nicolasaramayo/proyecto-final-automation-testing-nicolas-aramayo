@@ -33,7 +33,7 @@ def driver():
     - Deshabilita las esperas implícitas (se usarán esperas explícitas).
     - Al finalizar cada test, cierra el navegador limpiamente.
     """
-    logger.info("⚙️  Iniciando instancia de Chrome WebDriver...")
+    logger.info("Iniciando instancia de Chrome WebDriver...")
 
     # Opciones del navegador Chrome
     chrome_options = Options()
@@ -41,28 +41,35 @@ def driver():
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    # Descomenta la siguiente línea para ejecutar en modo headless (sin interfaz):
-    # chrome_options.add_argument("--headless=new")
+    # Activar modo headless automáticamente en CI (GitHub Actions) o si está configurado en el entorno
+    if os.environ.get("CI") or os.environ.get("HEADLESS"):
+        chrome_options.add_argument("--headless=new")
+        logger.info("ℹ️  Modo Headless ACTIVADO automáticamente en entorno CI.")
 
-    # Ruta al ChromeDriver 148 descargado localmente (compatible con Chrome 148)
-    import os
-    chromedriver_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "drivers", "chromedriver-win32", "chromedriver.exe"
-    )
-    service = Service(executable_path=chromedriver_path)
+    # Usar ChromeDriverManager de webdriver-manager para descargar el driver compatible
+    from webdriver_manager.chrome import ChromeDriverManager
+    driver_path = ChromeDriverManager().install()
+    
+    # Corregir bug de webdriver-manager en Windows donde a veces selecciona el archivo de licencias/noticias
+    if not driver_path.lower().endswith(".exe"):
+        base_dir = os.path.dirname(driver_path)
+        exe_path = os.path.join(base_dir, "chromedriver.exe")
+        if os.path.exists(exe_path):
+            driver_path = exe_path
+            
+    service = Service(executable_path=driver_path)
     chrome_driver = webdriver.Chrome(service=service, options=chrome_options)
 
     # Deshabilitar espera implícita (usamos esperas explícitas en helpers.py)
     chrome_driver.implicitly_wait(0)
 
-    logger.info("✅ Chrome WebDriver iniciado correctamente.")
+    logger.info("Chrome WebDriver iniciado correctamente.")
 
     # Ceder el driver al test
     yield chrome_driver
 
     # Teardown: cerrar el navegador al finalizar el test
-    logger.info("🔒 Cerrando instancia de Chrome WebDriver...")
+    logger.info("Cerrando instancia de Chrome WebDriver...")
     chrome_driver.quit()
 
 
@@ -76,13 +83,13 @@ def driver():
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     """
-    Hook de Pytest que captura una screenshot automáticamente cuando un test falla.
-    
-    La imagen se guarda en reports/screenshots/ con el nombre del test y la fecha/hora.
+    Hook de Pytest que captura una screenshot automáticamente cuando un test falla
+    y la adjunta al reporte HTML.
     """
     # Ejecutar el test y obtener el resultado
     outcome = yield
     report = outcome.get_result()
+    extra = getattr(report, "extra", [])
 
     # Solo actuar si la fase de ejecución ("call") falla
     if report.when == "call" and report.failed:
@@ -96,10 +103,27 @@ def pytest_runtest_makereport(item, call):
             # Nombre de archivo con timestamp para evitar sobreescrituras
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             safe_test_name = item.name.replace("::", "_").replace("/", "_")
-            screenshot_path = os.path.join(
-                screenshots_dir, f"{safe_test_name}_{timestamp}.png"
-            )
+            screenshot_name = f"{safe_test_name}_{timestamp}.png"
+            screenshot_path = os.path.join(screenshots_dir, screenshot_name)
 
             # Tomar y guardar la screenshot
             driver_fixture.save_screenshot(screenshot_path)
-            logger.warning(f"📸 Screenshot guardada en: {screenshot_path}")
+            logger.warning(f"Screenshot guardada en: {screenshot_path}")
+
+            # Ruta relativa al directorio del reporte (reports/) para el link del HTML
+            relative_path = os.path.join("screenshots", screenshot_name)
+            
+            # HTML para incrustar la imagen en el reporte
+            html = (
+                f'<div><img src="{relative_path}" alt="screenshot" style="width:300px;height:200px;" '
+                f'onclick="window.open(this.src)" align="right"/></div>'
+            )
+            
+            # Adjuntar al reporte usando pytest-html
+            try:
+                import pytest_html
+                extra.append(pytest_html.extras.html(html))
+            except ImportError:
+                logger.error("No se pudo importar pytest_html para adjuntar la captura al reporte.")
+
+    report.extra = extra
