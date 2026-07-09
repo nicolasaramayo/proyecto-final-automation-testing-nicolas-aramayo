@@ -16,13 +16,17 @@ class CheckoutPage(BasePage):
         logger.info(f"Datos del cliente completados: {first_name} {last_name}, CP: {postal_code}")
 
     def click_continue(self):
-        """Hace clic en el botón 'Continue' para pasar al siguiente paso."""
-        self.click(Locators.CONTINUE_BUTTON)
+        """Hace clic en el boton 'Continue' para pasar al siguiente paso."""
+        btn = self.wait_for_element_clickable(Locators.CONTINUE_BUTTON)
+        self.driver.execute_script("arguments[0].click();", btn)
+        self.wait_for_url_contains("/checkout-step-two.html")
         logger.info("Clic en 'Continue' de Checkout.")
 
     def click_finish(self):
-        """Hace clic en el botón 'Finish' para completar la compra."""
-        self.click(Locators.FINISH_BUTTON)
+        """Hace clic en el boton 'Finish' para completar la compra."""
+        btn = self.wait_for_element_clickable(Locators.FINISH_BUTTON)
+        self.driver.execute_script("arguments[0].click();", btn)
+        self.wait_for_url_contains("/checkout-complete.html")
         logger.info("Clic en 'Finish' para completar el pedido.")
 
     def get_complete_header_text(self):
