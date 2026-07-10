@@ -57,7 +57,10 @@ Entrega-Final-QA/
 |
 |-- datos/                       # Datos de prueba
 |   +-- users.json               # Credenciales para pruebas parametrizadas
-|
+
+|-- logs/                        # Archivos de log generados en ejecucion
+|   +-- .gitkeep
+
 |-- reports/                     # Reportes generados
 |   |-- .gitkeep
 |   |-- reporte.html             # Reporte HTML (generado por pytest-html)
